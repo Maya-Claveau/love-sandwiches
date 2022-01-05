@@ -1,6 +1,5 @@
 import gspread
 from google.oauth2.service_account import Credentials
-from pprint import pprint
 
 SCOPE = [
     "https://www.googleapis.com/auth/spreadsheets",
@@ -13,12 +12,13 @@ SCOPE_CREDS = CREDS.with_scopes(SCOPE)
 GSPREAD_CLIENT = gspread.authorize(SCOPE_CREDS)
 SHEET = GSPREAD_CLIENT.open("love_sandwiches")
 
+
 def get_sales_data():
     """
     Get sales figures input from the user
-    Run a while loop to collect a valid string of data from 
+    Run a while loop to collect a valid string of data from
     the user via the terminal, which must be a string of 6 numbers
-    separated by commas. The loop will repeatedly request data, until 
+    separated by commas. The loop will repeatedly request data, until
     it is valid.
     """
     while True:
@@ -26,8 +26,8 @@ def get_sales_data():
         print("Data should be six numbers, separated by commas.")
         print("Example: 10, 20, 30, 40, 50, 60\n")
 
-        data_str = input("Enter your data here: ")
-    
+        data_str = input("Enter your data here:\n")
+
         sales_data = data_str.split(",")
 
         if validate_data(sales_data):
@@ -35,7 +35,7 @@ def get_sales_data():
             break
 
     return sales_data
-    
+
 
 def validate_data(values):
     """
@@ -73,15 +73,17 @@ def validate_data(values):
 #     surplus_worksheet.append_row(data)
 #     print("Surplus worksheet updated successfully.\n")
 
+
 def update_worksheet(data, worksheet):
     """
     Receives a list of integers to be inserted into a worksheet
-    update the relevant worksheet with the data provided 
+    update the relevant worksheet with the data provided
     """
     print(f"Updating {worksheet} worksheet...\n")
     worksheet_to_update = SHEET.worksheet(worksheet)
     worksheet_to_update.append_row(data)
     print(f"{worksheet} worksheet updated successfully\n")
+
 
 def calculate_surplus_data(sales_row):
     """
@@ -94,7 +96,7 @@ def calculate_surplus_data(sales_row):
     print("Calculating surplus data...\n")
     stock = SHEET.worksheet("stock").get_all_values()
     stock_row = stock[-1]
-    
+
     surplus_data = []
     for stock, sales in zip(stock_row, sales_row):
         surplus = int(stock) - int(sales)
@@ -102,20 +104,23 @@ def calculate_surplus_data(sales_row):
 
     return surplus_data
 
+
 def get_last_5_entries_sales():
     """
     Collets collumns of data from sales worksheet, collecting the
-    last 5 entries for each sandwich and returns the data as a 
+    last 5 entries for each sandwich and returns the data as a
     list of lists.
     """
     sales = SHEET.worksheet("sales")
-    
+
     columns = []
     for ind in range(1, 7):
         column = sales.col_values(ind)
-        columns.append(column[-5:]) # the : here is because we need multipal value from the list        
-    
+        columns.append(column[-5:])  # the : here is because we need
+        # multipal value from the list
+
     return columns
+
 
 def calculate_stock_data(data):
     """
@@ -131,6 +136,7 @@ def calculate_stock_data(data):
         new_stock_data.append(round(stock_num))
 
     return new_stock_data
+
 
 def main():
     """
@@ -148,4 +154,3 @@ def main():
 
 print("Welcome to Love Sandwiches Data Automation")
 main()
-
