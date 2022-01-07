@@ -1,5 +1,10 @@
 import gspread
 from google.oauth2.service_account import Credentials
+import json
+
+# Every Google account has as an IAM (Identity and Access Management)
+# configuration which specifies what the user has access to.
+# The SCOPE lists the APIs that the program should access in order to run.
 
 SCOPE = [
     "https://www.googleapis.com/auth/spreadsheets",
@@ -7,7 +12,8 @@ SCOPE = [
     "https://www.googleapis.com/auth/drive"
     ]
 
-CREDS = Credentials.from_service_account_file('creds.json')
+creds = json.load(open("creds.json"))
+CREDS = Credentials.from_service_account_info(creds)
 SCOPE_CREDS = CREDS.with_scopes(SCOPE)
 GSPREAD_CLIENT = gspread.authorize(SCOPE_CREDS)
 SHEET = GSPREAD_CLIENT.open("love_sandwiches")
@@ -150,7 +156,18 @@ def main():
     sales_columns = get_last_5_entries_sales()
     stock_data = calculate_stock_data(sales_columns)
     update_worksheet(stock_data, "stock")
+    return stock_data
 
 
-print("Welcome to Love Sandwiches Data Automation")
-main()
+print("Welcome to Love Sandwiches Data Automation.\n")
+stock_data = main()
+
+
+def get_stock_values(data):    
+    headings = SHEET.worksheet("stock").row_values(1)
+
+    stock_dict = {key:value for key, value in zip(headings, data)}    
+    return stock_dict
+
+stock_values = get_stock_values(stock_data)
+print(stock_values)
